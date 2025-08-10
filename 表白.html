@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱的心声表白程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #ffc0cb;
+            font-family: 'Microsoft YaHei', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background-color: #ff6b9d;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .terminal {
+            padding: 20px;
+            height: 500px;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+        }
+        
+        .line {
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .red { color: #e74c3c; }
+        .green { color: #2ecc71; }
+        .yellow { color: #f39c12; }
+        .blue { color: #3498db; }
+        .purple { color: #9b59b6; }
+        .cyan { color: #1abc9c; }
+        .white { color: #7f8c8d; }
+        
+        .input-area {
+            display: flex;
+            margin-top: 15px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #ff4d87;
+        }
+        
+        .confession-container {
+            margin-top: 20px;
+        }
+        
+        .confession-line {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .heart {
+            color: #ff6b9d;
+            margin: 0 5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .author {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❤️ 爱的心声表白程序 ❤️</h1>
+        </div>
+        
+        <div class="terminal" id="terminal">
+            <div class="line">==========================================</div>
+            <div class="line">          爱的心声表达程序</div>
+            <div class="line">==========================================</div>
+            <div class="line green">请按提示输入名字</div>
+            <div class="line">（输入后点击提交按钮继续）</div>
+            <div class="line">==========================================</div>
+            <div class="line"></div>
+            
+            <!-- 输入区域 -->
+            <div id="input-section">
+                <div class="line" id="name-prompt">请输入你的名字:</div>
+                <div class="input-area">
+                    <input type="text" id="your-name-input" placeholder="你的名字">
+                    <button id="your-name-submit">提交</button>
+                </div>
+                
+                <div id="love-name-section" class="hidden">
+                    <div class="line" id="love-prompt">请输入你爱的人的名字:</div>
+                    <div class="input-area">
+                        <input type="text" id="love-name-input" placeholder="你爱的人的名字">
+                        <button id="love-name-submit">提交</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 故事内容区域 -->
+            <div id="story" class="hidden"></div>
+            
+            <!-- 表白内容区域 -->
+            <div id="confession-container" class="hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        // 存储名字
+        let yourName = "";
+        let loverName = "";
+        let currentStep = 0;
+        
+        // DOM元素
+        const terminal = document.getElementById('terminal');
+        const inputSection = document.getElementById('input-section');
+        const storySection = document.getElementById('story');
+        const confessionContainer = document.getElementById('confession-container');
+        
+        // 确认用户名字
+        document.getElementById('your-name-submit').addEventListener('click', function() {
+            yourName = document.getElementById('your-name-input').value.trim();
+            if (yourName) {
+                addLine(`<span class="green">已确认你的名字: ${yourName}</span>`);
+                document.getElementById('love-name-section').classList.remove('hidden');
+            } else {
+                addLine('<span class="yellow">名字不能为空，请重新输入</span>');
+            }
+        });
+        
+        // 确认爱人名字
+        document.getElementById('love-name-submit').addEventListener('click', function() {
+            loverName = document.getElementById('love-name-input').value.trim();
+            if (loverName) {
+                addLine(`<span class="green">已确认爱人名字: ${loverName}</span>`);
+                inputSection.classList.add('hidden');
+                storySection.classList.remove('hidden');
+                confessionContainer.classList.remove('hidden');
+                
+                // 开始表白故事
+                startLoveStory();
+            } else {
+                addLine('<span class="yellow">名字不能为空，请重新输入</span>');
+            }
+        });
+        
+        // 添加行到终端
+        function addLine(content, delay = 0) {
+            if (delay > 0) {
+                setTimeout(() => {
+                    createLine(content);
+                }, delay);
+            } else {
+                createLine(content);
+            }
+        }
+        
+        function createLine(content) {
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.innerHTML = content;
+            terminal.appendChild(line);
+            
+            // 滚动到最底部
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+        
+        // 故事对话内容
+        const storyLines = [
+            {content: '<span class="purple">正在加载表白程序...</span>', delay: 1000},
+            {content: '<span class="green">加载完成！</span>', delay: 1000},
+            {content: '<span class="red">{yourName}: {loverName}，我们要走了!</span>', delay: 1000},
+            {content: '<span class="green">{loverName}: 我在!</span>', delay: 1000},
+            {content: '<span class="yellow">system已删除</span>', delay: 1000},
+            {content: '<span class="red">{yourName}: {loverName}，在走之前我想说...其实我喜欢你</span>', delay: 1500},
+            {content: '<span class="green">{loverName}: 我在!!</span>', delay: 700},
+            {content: '<span class="yellow">sdcard已清除</span>', delay: 700},
+            {content: '<span class="yellow">关机倒计时</span>', delay: 1000},
+            {content: '<span class="red">{yourName}: {loverName}，你知道吗我有多喜欢你吗？超越所有物质的喜欢!</span>', delay: 2000},
+            {content: '<span class="yellow">倒计时 3</span>', delay: 700},
+            {content: '<span class="green">{loverName}: 我在!!!</span>', delay: 700},
+            {content: '<span class="red">{yourName}: {loverName}，你理解吗?</span>', delay: 1700},
+            {content: '<span class="green">{loverName}: 我在!!!!</span>', delay: 700},
+            {content: '<span class="yellow">倒计时 2</span>', delay: 700},
+            {content: '<span class="red">{yourName}: {loverName}，我真的好想好想永远永远和你在一起，不分开!!</span>', delay: 5000},
+            {content: '<span class="green">{loverName}: 我在!!!!!!</span>', delay: 700},
+            {content: '<span class="yellow">倒计时 1</span>', delay: 2000},
+            {content: '<span class="white">{yourName}离开了......</span>', delay: 700},
+            {content: '<span class="green">{loverName}: 我也爱你......</span>', delay: 3500},
+            {content: '<span class="yellow">文本加载完毕!</span>', delay: 2000}
+        ];
+        
+        // 开始故事
+        function startLoveStory() {
+            // 逐句显示故事
+            function showNextLine() {
+                if (currentStep < storyLines.length) {
+                    const line = storyLines[currentStep];
+                    // 替换名字占位符
+                    let content = line.content
+                        .replace(/{yourName}/g, yourName)
+                        .replace(/{loverName}/g, loverName);
+                    
+                    addLine(content);
+                    currentStep++;
+                    setTimeout(showNextLine, line.delay);
+                } else {
+                    // 显示表白内容
+                    showConfessionContent();
+                }
+            }
+            
+            showNextLine();
+        }
+        
+        // 表白内容
+        function showConfessionContent() {
+            addLine('<span class="purple">开始新的加载!</span>', 1000);
+            addLine(`<span class="blue">${yourName}想对${loverName}说</span>`, 1000);
+            addLine('<span class="purple">我喜欢你，从我们相识的那一刻起，你就一直在我的心中。</span>', 1000);
+            addLine('<span class="purple">你的笑容让我心动，你的温柔让我感动。</span>', 1300);
+            addLine('<span class="purple">无论发生什么，我都愿意陪伴在你身边，与你一起经历生活的点点滴滴。</span>', 1000);
+            addLine('<span class="purple">我真心希望能够得到你的回应，一起走进彼此的未来。</span>', 1800);
+            addLine('<span class="red">我爱你!!</span>', 1800);
+            
+            // 静态表白内容
+            setTimeout(showStaticConfession, 3000);
+        }
+        
+        // 静态表白内容
+        function showStaticConfession() {
+            addLine(`<span class="purple">向${loverName}的表白:</span>`, 1000);
+            
+            // 定义表白语句
+            const statements = [
+                `一生只爱${loverName} ❤️520`,
+                `永远爱你 ❤️520`,
+                `一直陪伴${loverName} ❤️520`,
+                `我喜欢你 ❤️520`,
+                `爱你${loverName} ❤️520`,
+                `保护你 ❤️520`
+            ];
+            
+            const colors = ["purple", "red", "yellow", "green", "blue", "cyan"];
+            
+            // 添加静态表白内容
+            for (let i = 0; i < statements.length; i++) {
+                addLine(`<span class="${colors[i]}">${statements[i]}</span>`, i * 500);
+            }
+            
+            // 显示结束信息
+            setTimeout(() => {
+                addLine(`<span class="purple">遇见${loverName}是${yourName}最大的幸运</span>`);
+                addLine(`<span class="cyan">能和你在一起我真的很开心</span>`);
+                
+                // 最终致谢
+                addLine(`<span class="green">表白程序圆满完成！</span>`);
+                addLine(`<span class="yellow">感谢使用此表达真心的程序</span>`);
+                addLine(`<span class="blue">愿你们的爱情如同这永不停止的表白一样永恒</span>`);
+                
+                // 添加作者信息
+                addLine(`<div class="author">作者: Deep seek R1</div>`);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
